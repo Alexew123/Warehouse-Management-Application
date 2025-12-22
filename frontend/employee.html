@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard - Warehouse Management</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 230px;
+            height: 100vh;
+            background-color: #1f2937;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 22px;
+        }
+
+        .sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            color: #cbd5e1;
+            font-size: 16px;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #374151;
+            color: white;
+        }
+
+        /* Top bar */
+        .topbar {
+            margin-left: 230px;
+            height: 60px;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .topbar button {
+            padding: 8px 16px;
+            border: none;
+            background-color: #b91c1c;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .topbar button:hover {
+            background-color: #dc2626;
+        }
+
+        /* Main content area */
+        .content {
+            margin-left: 230px;
+            padding: 20px;
+        }
+
+        .content h1 {
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            text-align: left;
+        }
+
+        tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .action-btn {
+            color: #1e40af;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Employee Panel</h2>
+        <a href="#">Dashboard</a>
+        <a href="#">My Tasks</a>
+        <a href="#">Inventory</a>
+        <a href="#">Reports</a>
+    </div>
+
+    <!-- Top bar -->
+    <div class="topbar">
+        <button>Logout</button>
+    </div>
+
+    <!-- Main content -->
+    <div class="content">
+        <h1>Inventory Overview</h1>
+
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Item Name</th>
+                <th>Available Units</th>
+                <th>Warehouse</th>
+                <th>Action</th>
+            </tr>
+            <tr>
+                <td>101</td>
+                <td>Wooden Pallets</td>
+                <td>150</td>
+                <td>Main Warehouse</td>
+                <td class="action-btn">Update</td>
+            </tr>
+            <tr>
+                <td>205</td>
+                <td>Metal Bolts</td>
+                <td>340</td>
+                <td>Warehouse B</td>
+                <td class="action-btn">Update</td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+</html>
