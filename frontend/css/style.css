@@ -1,0 +1,89 @@
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/* Global Reset */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Nice gradient background instead of flat gray */
+    background: #f4f4f4;
+    font-family: Arial, sans-serif;
+}
+
+/* Container Styling */
+.login-container {
+    background-color: white;
+    padding: 40px;
+    border-radius: 12px; /* Softer corners */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2); /* Deeper shadow for "pop" */
+    text-align: center;
+    width: 350px;
+}
+
+.login-container h1 {
+    margin-bottom: 30px;
+    color: #333;
+    font-weight: 700;
+    font-size: 24px;
+}
+
+/* Inputs */
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #667eea; /* Highlight color on click */
+    background-color: white;
+}
+
+/* Button */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #667eea; /* Matching theme color */
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+button:hover {
+    background-color: #5a6fd6;
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Error Message */
+.error {
+    color: #e74c3c;
+    background-color: #fdecea;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-top: 15px;
+    display: none;
+    border: 1px solid #fadbd8;
+}

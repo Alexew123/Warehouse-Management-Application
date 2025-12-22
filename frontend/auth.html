@@ -4,73 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Warehouse Management - Login</title>
-    <style>
-        /* Full page styling */
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f4f4f4;
-            font-family: Arial, sans-serif;
-        }
-
-        /* Login container */
-        .login-container {
-            background-color: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            text-align: center;
-            width: 300px;
-        }
-
-        /* Title */
-        .login-container h1 {
-            margin-bottom: 30px;
-            color: #333;
-        }
-
-        /* Input fields */
-        /* Input fields and button */
-        input[type="text"], input[type="password"], button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0 20px 0;
-            border-radius: 5px;
-            font-size: 16px;
-            box-sizing: border-box; /* ensures width includes padding/border */
-        }
-
-        button {
-            background-color: #007bff;
-            border: none;
-            color: white;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-    </style>
+    
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
     <div class="login-container">
-        <h1>Warehouse Management</h1>
-        <form action="#" method="post">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Login</button>
-            <p style="text-align:center; margin-top: 10px;">
-            <a href="admin.html">Continue to Dashboard (Mock Login)</a>
-            </p>
-            <p style="text-align:center; margin-top: 10px;">
-                <a href="employee.html">Continue to Employee Dashboard (Mock Login)</a>
-            </p>
+        <h1>Warehouse Login</h1>
+        
+        <form id="loginForm">
+            <input type="text" id="username" name="username" placeholder="Username" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            
+            <button type="submit">Sign In</button>
+            
+            <p id="error-msg" class="error"></p>
         </form>
     </div>
+
+    <script src="js/auth.js"></script>
+
 </body>
 </html>
