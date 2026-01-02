@@ -1,7 +1,6 @@
-/* Import Google Font */
+
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
-/* Global Reset */
 * {
     box-sizing: border-box;
 }
@@ -13,17 +12,15 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Nice gradient background instead of flat gray */
     background: #f4f4f4;
     font-family: Arial, sans-serif;
 }
 
-/* Container Styling */
 .login-container {
     background-color: white;
     padding: 40px;
-    border-radius: 12px; /* Softer corners */
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2); /* Deeper shadow for "pop" */
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     text-align: center;
     width: 350px;
 }
@@ -35,7 +32,6 @@ body {
     font-size: 24px;
 }
 
-/* Inputs */
 input[type="text"], input[type="password"] {
     width: 100%;
     padding: 12px 15px;
@@ -49,15 +45,14 @@ input[type="text"], input[type="password"] {
 
 input:focus {
     outline: none;
-    border-color: #667eea; /* Highlight color on click */
+    border-color: #667eea;
     background-color: white;
 }
 
-/* Button */
 button {
     width: 100%;
     padding: 12px;
-    background-color: #667eea; /* Matching theme color */
+    background-color: #667eea;
     border: none;
     border-radius: 8px;
     color: white;
@@ -69,14 +64,13 @@ button {
 
 button:hover {
     background-color: #5a6fd6;
-    transform: translateY(-2px); /* Slight lift effect */
+    transform: translateY(-2px);
 }
 
 button:active {
     transform: translateY(0);
 }
 
-/* Error Message */
 .error {
     color: #e74c3c;
     background-color: #fdecea;

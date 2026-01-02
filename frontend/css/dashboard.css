@@ -1,4 +1,4 @@
-/* Reset & Font */
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -12,7 +12,6 @@ body {
     background-color: #f4f6f9;
 }
 
-/* Sidebar */
 .sidebar {
     width: 250px;
     background-color: #343a40;
@@ -25,7 +24,7 @@ body {
 .sidebar h2 {
     text-align: center;
     margin-bottom: 40px;
-    color: #667eea; /* Matching your login purple */
+    color: #667eea;
 }
 
 .sidebar ul {
@@ -60,10 +59,9 @@ body {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    margin-top: auto; /* Pushes button to bottom */
+    margin-top: auto;
 }
 
-/* Main Content */
 .main-content {
     flex-grow: 1;
     padding: 30px;
@@ -78,7 +76,7 @@ header h1 {
     color: #333;
 }
 
-/* Dashboard Cards */
+
 .cards-container {
     display: flex;
     gap: 20px;
@@ -104,7 +102,6 @@ header h1 {
     color: #333;
 }
 
-/* Table Styles */
 .table-container {
     background: white;
     padding: 20px;
@@ -143,16 +140,17 @@ tr:hover {
 }
 
 .role-admin { background-color: #e8dff5; color: #667eea; }
+.role-manager { background-color: #fff3cd; color: #856404; }
 .role-employee { background-color: #d4edda; color: #155724; }
 
-/* Header Layout for Button */
+
 .header-flex {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-/* Add User Button */
+
 .add-btn {
     background-color: #667eea;
     color: white;
@@ -168,26 +166,106 @@ tr:hover {
     background-color: #5a6fd6;
 }
 
-/* --- Modal (Popup) Styles --- */
+
 .modal {
-    display: none; /* Hidden by default */
+    display: none;
     position: fixed;
-    z-index: 100;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5); /* Black with opacity */
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-content {
     background-color: white;
     margin: 10% auto;
     padding: 30px;
-    width: 400px;
-    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     position: relative;
+    max-height: 90hv;
+    overflow-y: auto;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-row > div {
+    flex: 1; /* Each div takes equal width */
+}
+
+.modal-content label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #555;
+}
+
+.modal-content input, 
+.modal-content select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box; 
+    font-size: 14px;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #667eea;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+.submit-btn:hover {
+    background-color: #5a6fd6;
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.close:hover {
+    color: white;
+    background-color: #e74c3c;
+    border-radius: 50%;
 }
 
 .close-btn {
@@ -209,4 +287,33 @@ tr:hover {
     margin-bottom: 15px;
     border: 1px solid #ddd;
     border-radius: 5px;
+}
+
+.delete-btn {
+    background-color: transparent;
+    border: 2px solid #e74c3c;
+    color: #e74c3c;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.delete-btn:hover {
+    background-color: #e74c3c;
+    color: white;
+    transform: scale(1.1); 
+}
+
+td:last-child, th:last-child {
+    text-align: center;
+    width: 80px;
 }
