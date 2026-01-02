@@ -317,3 +317,16 @@ td:last-child, th:last-child {
     text-align: center;
     width: 80px;
 }
+
+
+.badge {
+    display: inline-block;
+    background-color: #e2e8f0;
+    color: #2d3748;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 500;
+    margin-right: 5px;
+    border: 1px solid #cbd5e0;
+}

@@ -205,3 +205,172 @@ window.deleteUser = async function(userId, bindKey) {
         alert("Failed to delete user.");
     }
 };
+
+const inventoryLink = document.getElementById('inventory-link');
+
+inventoryLink.addEventListener('click', async (e) => {
+    e.preventDefault();
+    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+    inventoryLink.classList.add('active');
+
+    const token = localStorage.getItem('token');
+
+    try {
+
+        const [globalRes, productsRes, warehousesRes] = await Promise.all([
+            fetch('http://127.0.0.1:5000/inventory/global', { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch('http://127.0.0.1:5000/inventory/products', { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch('http://127.0.0.1:5000/warehouses/', { headers: { 'Authorization': `Bearer ${token}` } })
+        ]);
+
+        const inventory = await globalRes.json();
+        const products = await productsRes.json();
+        const warehouses = await warehousesRes.json();
+
+        const productOptions = products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+        const warehouseOptions = warehouses.map(w => `<option value="${w.bind_key}">${w.name}</option>`).join('');
+    
+        const allLocationsOptions = `<option value="">Headquarters (Main)</option>` + warehouseOptions;
+
+        const tableRows = inventory.map(item => {
+            const distribution = item.breakdown.map(b => 
+                `<span class="badge">${b.location}: ${b.quantity}</span>`
+            ).join(' ');
+            
+            return `
+                <tr>
+                    <td><strong>${item.name}</strong></td>
+                    <td>${item.category}</td>
+                    <td>${item.price} RON</td>
+                    <td style="font-size: 1.1em; font-weight: bold;">${item.total_quantity}</td>
+                    <td>${distribution || '<span style="color:#aaa">Out of Stock</span>'}</td>
+                </tr>`;
+        }).join('');
+
+        mainContent.innerHTML = `
+            <header class="header-flex">
+                <h1>Inventory Management</h1>
+                <div style="display: flex; gap: 10px;">
+                    <button id="openProductModal" class="add-btn" style="background-color: #2ecc71;">+ New Product</button>
+                    <button id="openStockModal" class="add-btn">+ Add Stock</button>
+                </div>
+            </header>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Global Total</th>
+                            <th>Distribution</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            </div>
+
+            <div id="productModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" id="closeProduct">&times;</span>
+                    <h2>Create New Product</h2>
+                    <form id="createProductForm">
+                        <label>Product Name</label>
+                        <input type="text" id="prod_name" required placeholder="">
+                        
+                        <div class="form-row">
+                            <div>
+                                <label>Category</label>
+                                <input type="text" id="prod_cat" required placeholder="e.g. Electronics">
+                            </div>
+                            <div>
+                                <label>Price (RON)</label>
+                                <input type="number" id="prod_price" required step="0.01">
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-btn">Create Product</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="stockModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" id="closeStock">&times;</span>
+                    <h2>Add Stock to Warehouse</h2>
+                    <form id="addStockForm">
+                        <label>Select Product</label>
+                        <select id="stock_prod_id" required>
+                            <option value="">-- Choose Product --</option>
+                            ${productOptions}
+                        </select>
+
+                        <div class="form-row">
+                            <div>
+                                <label>Warehouse</label>
+                                <select id="stock_bind_key">
+                                    ${allLocationsOptions}
+                                </select>
+                            </div>
+                            <div>
+                                <label>Quantity</label>
+                                <input type="number" id="stock_qty" required min="1" value="1">
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-btn">Update Stock</button>
+                    </form>
+                </div>
+            </div>
+        `;
+
+        setupModal('productModal', 'openProductModal', 'closeProduct');
+        setupModal('stockModal', 'openStockModal', 'closeStock');
+
+        document.getElementById('createProductForm').onsubmit = async (e) => {
+            e.preventDefault();
+            await postData('http://127.0.0.1:5000/inventory/products', {
+                name: document.getElementById('prod_name').value,
+                category: document.getElementById('prod_cat').value,
+                price: parseFloat(document.getElementById('prod_price').value)
+            }, token);
+        };
+
+        document.getElementById('addStockForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const wKey = document.getElementById('stock_bind_key').value;
+            await postData('http://127.0.0.1:5000/inventory/stock', {
+                product_id: document.getElementById('stock_prod_id').value,
+                warehouse_bind_key: wKey === "" ? null : wKey,
+                quantity: document.getElementById('stock_qty').value
+            }, token);
+        };
+
+    } catch (error) {
+        console.error(error);
+        mainContent.innerHTML = '<p class="error">Failed to load inventory.</p>';
+    }
+});
+
+function setupModal(modalId, openBtnId, closeBtnId) {
+    const modal = document.getElementById(modalId);
+    document.getElementById(openBtnId).onclick = () => modal.style.display = "flex";
+    document.getElementById(closeBtnId).onclick = () => modal.style.display = "none";
+    window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
+}
+
+async function postData(url, data, token) {
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(data)
+        });
+        if (res.ok) {
+            alert("Success!");
+            document.getElementById('inventory-link').click(); // Reload page
+        } else {
+            const err = await res.json();
+            alert("Error: " + err.msg);
+        }
+    } catch (e) { console.error(e); alert("Request failed"); }
+}

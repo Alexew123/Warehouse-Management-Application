@@ -4,10 +4,11 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from dotenv import load_dotenv
 
-from models import db, User, Warehouse
+from models import db, User, Warehouse, Product, Stock
 from routes.auth import auth_bp
 from routes.users import users_bp
 from routes.warehouse import warehouses_bp
+from routes.inventory import inventory_bp
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
@@ -30,6 +31,7 @@ CORS(app)
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(users_bp, url_prefix='/users')
 app.register_blueprint(warehouses_bp, url_prefix='/warehouses')
+app.register_blueprint(inventory_bp, url_prefix='/inventory')
 
 if __name__ == '__main__':
     with app.app_context():
