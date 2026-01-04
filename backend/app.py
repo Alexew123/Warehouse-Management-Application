@@ -9,6 +9,7 @@ from routes.auth import auth_bp
 from routes.users import users_bp
 from routes.warehouse import warehouses_bp
 from routes.inventory import inventory_bp
+from routes.transfers import transfers_bp
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
@@ -32,6 +33,7 @@ app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(users_bp, url_prefix='/users')
 app.register_blueprint(warehouses_bp, url_prefix='/warehouses')
 app.register_blueprint(inventory_bp, url_prefix='/inventory')
+app.register_blueprint(transfers_bp, url_prefix='/transfers')
 
 if __name__ == '__main__':
     with app.app_context():
