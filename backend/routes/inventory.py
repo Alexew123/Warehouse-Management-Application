@@ -52,7 +52,7 @@ def get_global_inventory():
                             })
 
             except Exception as e:
-                print(f"⚠️ Error reading inventory from {target.name}: {e}")
+                print(f"Error reading inventory from {target.name}: {e}")
 
         results = list(inventory_map.values())
         return jsonify(results), 200
@@ -141,7 +141,7 @@ def delete_product(product_id):
                         session.delete(entry)
                     session.commit()
             except Exception as e:
-                print(f"⚠️ Failed to clean stock in {target.bind_key}: {e}")
+                print(f"Failed to clean stock in {target.bind_key}: {e}")
 
         product = Product.query.get(product_id)
         if product:

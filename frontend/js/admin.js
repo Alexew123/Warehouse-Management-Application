@@ -591,3 +591,162 @@ window.removeStock = async function(prodId, wKey) {
         else { alert("Error removing stock"); }
     } catch(e) { console.error(e); }
 };
+
+async function loadDashboardCharts() {
+    const token = localStorage.getItem('token');
+    
+    try {
+        const [inventoryRes, transfersRes, usersRes] = await Promise.all([
+            fetch('http://127.0.0.1:5000/inventory/global', { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch('http://127.0.0.1:5000/transfers/?location=main', { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch('http://127.0.0.1:5000/auth/users', { headers: { 'Authorization': `Bearer ${token}` } })
+        ]);
+
+        const inventory = await inventoryRes.json();
+        const transfers = await transfersRes.json();
+        const users = await usersRes.json();
+
+        // --- 1. SMART USER MATCHER ---
+        // This fixes the ID Collision (Mihai vs Mirela) AND the Missing Data issue
+        const getUserName = (id, location) => {
+            if (!id) return null;
+
+            // 1. Get all users with this ID (This handles the collision)
+            // Example: Returns [Mihai (ID 3), Mirela (ID 3)]
+            const candidates = users.filter(u => u.id === id);
+
+            if (candidates.length === 0) return `Unknown (ID:${id})`;
+            
+            // 2. If there's only one user with this ID, return them immediately.
+            if (candidates.length === 1) return candidates[0].name;
+
+            // 3. If there are duplicates (ID Collision), filter by Location Name
+            const search = (location === 'main') ? 'hq' : location.toLowerCase();
+            
+            const match = candidates.find(u => u.name.toLowerCase().includes(search));
+            
+            // Return the match, or fallback to the first candidate if naming is weird
+            return match ? match.name : candidates[0].name;
+        };
+
+        // --- 2. DATA PROCESSING ---
+
+        // A. Inventory
+        const locStats = {};
+        inventory.forEach(item => {
+            item.breakdown.forEach(b => {
+                const loc = b.location.toUpperCase();
+                locStats[loc] = (locStats[loc] || 0) + b.quantity;
+            });
+        });
+
+        // B. Transfer Status
+        const statusStats = { 'COMPLETED': 0, 'PENDING': 0, 'IN_TRANSIT': 0, 'APPROVED': 0, 'DENIED': 0 };
+        
+        // C. Manager Volume
+        const warehouseVol = {};
+
+        // D. Employee Performance
+        const employeeTasks = {};
+        
+        // Initialize: Add every Employee/Manager with 0 tasks
+        users.forEach(u => {
+            if (u.role) {
+                const r = u.role.toLowerCase().trim();
+                if (r !== 'admin') {
+                    employeeTasks[u.name] = 0;
+                }
+            }
+        });
+
+        transfers.forEach(t => {
+            // Status
+            if (statusStats[t.status] !== undefined) statusStats[t.status]++;
+
+            // Volume
+            const src = t.source.toUpperCase();
+            const dst = t.destination.toUpperCase();
+            warehouseVol[src] = (warehouseVol[src] || 0) + 1;
+            warehouseVol[dst] = (warehouseVol[dst] || 0) + 1;
+
+            // TASK COUNTING
+            if (t.sender_id) {
+                const name = getUserName(t.sender_id, t.source);
+                // Dynamically add user if they weren't in the init list
+                if (name) employeeTasks[name] = (employeeTasks[name] || 0) + 1;
+            }
+            if (t.receiver_id) {
+                const name = getUserName(t.receiver_id, t.destination);
+                if (name) employeeTasks[name] = (employeeTasks[name] || 0) + 1;
+            }
+        });
+
+        // --- 3. DRAW CHARTS ---
+
+        // Inventory
+        new Chart(document.getElementById('inventoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(locStats),
+                datasets: [{
+                    data: Object.values(locStats),
+                    backgroundColor: ['#3498db', '#e74c3c', '#f1c40f', '#9b59b6']
+                }]
+            }
+        });
+
+        // Transfer Status
+        new Chart(document.getElementById('transferChart'), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(statusStats),
+                datasets: [{
+                    label: 'Requests',
+                    data: Object.values(statusStats),
+                    backgroundColor: ['#27ae60', '#e67e22', '#f1c40f', '#3498db', '#e74c3c']
+                }]
+            },
+            options: { plugins: { legend: { display: false } } }
+        });
+
+        // Manager Volume
+        new Chart(document.getElementById('managerChart'), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(warehouseVol),
+                datasets: [{
+                    label: 'Total Transfers',
+                    data: Object.values(warehouseVol),
+                    backgroundColor: '#9b59b6'
+                }]
+            },
+            options: { indexAxis: 'y', plugins: { legend: { display: false } } }
+        });
+
+        // Employee Performance
+        const sortedEmps = Object.entries(employeeTasks).sort(([,a], [,b]) => b - a);
+
+        new Chart(document.getElementById('employeeChart'), {
+            type: 'bar',
+            data: {
+                labels: sortedEmps.map(e => e[0]),
+                datasets: [{
+                    label: 'Tasks Completed',
+                    data: sortedEmps.map(e => e[1]),
+                    backgroundColor: '#3498db'
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+
+    } catch (e) {
+        console.error("Error loading charts:", e);
+    }
+}
+
+loadDashboardCharts();

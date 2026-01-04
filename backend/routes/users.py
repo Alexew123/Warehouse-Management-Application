@@ -64,13 +64,11 @@ def create_user():
     )
 
     try:
-        # 1. Select Engine
         if target_bind is None:
              engine = db.engine
         else:
              engine = db.engines[target_bind]
 
-        # 2. Open Temp Session and Save
         with db.Session(bind=engine) as temp_session:
             temp_session.add(new_user)
             temp_session.commit()
