@@ -1,7 +1,7 @@
 const token = localStorage.getItem('token');
 if (!token) window.location.href = 'auth.html';
 
-document.getElementById('username-display').textContent = localStorage.getItem('username');
+document.getElementById('username-display').textContent = localStorage.getItem('full_name');
 document.getElementById('role-display').textContent = localStorage.getItem('role');
 
 const mainContent = document.getElementById('main-content');
@@ -374,3 +374,220 @@ async function postData(url, data, token) {
         }
     } catch (e) { console.error(e); alert("Request failed"); }
 }
+
+inventoryLink.addEventListener('click', async (e) => {
+    e.preventDefault();
+    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+    inventoryLink.classList.add('active');
+
+    const token = localStorage.getItem('token');
+
+    try {
+        const [globalRes, productsRes, warehousesRes] = await Promise.all([
+            fetch('http://127.0.0.1:5000/inventory/global', { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch('http://127.0.0.1:5000/inventory/products', { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch('http://127.0.0.1:5000/warehouses/', { headers: { 'Authorization': `Bearer ${token}` } })
+        ]);
+
+        const inventory = await globalRes.json();
+        const products = await productsRes.json();
+        const warehouses = await warehousesRes.json();
+        
+        const getBindKey = (name) => {
+            if(name === "Headquarters") return 'null';
+            const w = warehouses.find(wh => wh.name === name);
+            return w ? w.bind_key : null;
+        };
+
+        const productOptions = products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+        const warehouseOptions = warehouses.map(w => `<option value="${w.bind_key}">${w.name}</option>`).join('');
+        const allLocationsOptions = `<option value="">Headquarters (Main)</option>` + warehouseOptions;
+
+        const tableRows = inventory.map(item => {
+            const distribution = item.breakdown.map(b => {
+                const bKey = getBindKey(b.location);
+                return `
+                <span class="badge">
+                    ${b.location}: ${b.quantity}
+                    <span class="badge-remove" onclick="removeStock(${item.id}, '${bKey}')" title="Remove from this warehouse">&times;</span>
+                </span>`;
+            }).join(' ');
+            
+            return `
+                <tr>
+                    <td><strong>${item.name}</strong></td>
+                    <td>${item.category}</td>
+                    <td>$${item.price}</td>
+                    <td style="font-size: 1.1em; font-weight: bold;">${item.total_quantity}</td>
+                    <td>${distribution || '<span style="color:#aaa">Out of Stock</span>'}</td>
+                    <td style="text-align: center;">
+                        <button class="delete-btn" onclick="deleteProduct(${item.id})">&times;</button>
+                    </td>
+                </tr>`;
+        }).join('');
+
+        mainContent.innerHTML = `
+            <header class="header-flex">
+                <h1>Inventory Management</h1>
+                <div style="display: flex; gap: 10px;">
+                    <button id="openProductModal" class="add-btn" style="background-color: #2ecc71;">+ New Product</button>
+                    <button id="openStockModal" class="add-btn">+ Add Stock</button>
+                </div>
+            </header>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Global Total</th>
+                            <th>Distribution</th>
+                            <th>Action</th> </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            </div>
+            
+            <div id="productModal" class="modal"><div class="modal-content"><span class="close" id="closeProduct">&times;</span><h2>Create New Product</h2><form id="createProductForm"><label>Product Name</label><input type="text" id="prod_name" required><div class="form-row"><div><label>Category</label><input type="text" id="prod_cat" required></div><div><label>Price ($)</label><input type="number" id="prod_price" required step="0.01"></div></div><button type="submit" class="submit-btn">Create Product</button></form></div></div>
+            <div id="stockModal" class="modal"><div class="modal-content"><span class="close" id="closeStock">&times;</span><h2>Add Stock to Warehouse</h2><form id="addStockForm"><label>Select Product</label><select id="stock_prod_id" required><option value="">-- Choose Product --</option>${productOptions}</select><div class="form-row"><div><label>Warehouse</label><select id="stock_bind_key">${allLocationsOptions}</select></div><div><label>Quantity</label><input type="number" id="stock_qty" required min="1" value="1"></div></div><button type="submit" class="submit-btn">Update Stock</button></form></div></div>
+        `;
+
+        setupModal('productModal', 'openProductModal', 'closeProduct');
+        setupModal('stockModal', 'openStockModal', 'closeStock');
+
+        document.getElementById('createProductForm').onsubmit = async (e) => {
+            e.preventDefault();
+            await postData('http://127.0.0.1:5000/inventory/products', {
+                name: document.getElementById('prod_name').value,
+                category: document.getElementById('prod_cat').value,
+                price: parseFloat(document.getElementById('prod_price').value)
+            }, token);
+        };
+
+        document.getElementById('addStockForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const wKey = document.getElementById('stock_bind_key').value;
+            await postData('http://127.0.0.1:5000/inventory/stock', {
+                product_id: document.getElementById('stock_prod_id').value,
+                warehouse_bind_key: wKey === "" ? null : wKey,
+                quantity: document.getElementById('stock_qty').value
+            }, token);
+        };
+
+    } catch (error) {
+        console.error(error);
+        mainContent.innerHTML = '<p class="error">Failed to load inventory.</p>';
+    }
+});
+
+const transfersLink = document.getElementById('transfers-link');
+
+transfersLink.addEventListener('click', async (e) => {
+    e.preventDefault();
+    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+    transfersLink.classList.add('active');
+
+    const token = localStorage.getItem('token');
+    
+    try {
+        const [transfersRes, usersRes] = await Promise.all([
+            fetch('http://127.0.0.1:5000/transfers/?location=main', { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch('http://127.0.0.1:5000/auth/users', { headers: { 'Authorization': `Bearer ${token}` } })
+        ]);
+
+        const transfers = await transfersRes.json();
+        const users = await usersRes.json();
+
+        const findUser = (id, location) => {
+            if (!id) return '-';
+            
+            const searchTerm = (location === 'main') ? 'hq' : location;
+
+            const match = users.find(u => u.id === id && u.name.toLowerCase().includes(searchTerm));
+            return match ? match.name : `ID: ${id}`;
+        };
+
+        const rows = transfers.map(t => {
+            const statusClass = `status-${t.status.toLowerCase()}`;
+            
+            const senderName = findUser(t.sender_id, t.source);
+            const receiverName = findUser(t.receiver_id, t.destination);
+
+            return `
+                <tr>
+                    <td>${t.id}</td>
+                    <td>${t.created_at}</td>
+                    <td><strong>${t.source.toUpperCase()}</strong> ➔ <strong>${t.destination.toUpperCase()}</strong></td>
+                    <td>${t.product_name} (x${t.quantity})</td>
+                    <td>
+                        <div style="font-size: 12px; line-height: 1.4;">
+                            <span style="color: #666;">From:</span> <strong>${senderName}</strong><br>
+                            <span style="color: #666;">To:</span> <strong>${receiverName}</strong>
+                        </div>
+                    </td>
+                    <td><span class="badge ${statusClass}">${t.status}</span></td>
+                </tr>
+            `;
+        }).join('');
+
+        const mainContent = document.getElementById('main-content');
+        mainContent.innerHTML = `
+            <header>
+                <h1>Global Transfer Monitor</h1>
+                <p>Real-time oversight of all logistics operations.</p>
+            </header>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Route</th>
+                            <th>Cargo</th>
+                            <th>Chain of Custody</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows.length ? rows : '<tr><td colspan="6">No transfers recorded.</td></tr>'}</tbody>
+                </table>
+            </div>
+        `;
+
+    } catch (error) {
+        console.error(error);
+        const mainContent = document.getElementById('main-content');
+        if(mainContent) mainContent.innerHTML = `<p class="error">Error loading global data.</p>`;
+    }
+});
+
+
+window.deleteProduct = async function(id) {
+    if(!confirm("WARNING: This will delete the product AND all its stock from every warehouse. Are you sure?")) return;
+    
+    const token = localStorage.getItem('token');
+    try {
+        const res = await fetch(`http://127.0.0.1:5000/inventory/products/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if(res.ok) { document.getElementById('inventory-link').click(); }
+        else { alert("Error deleting product"); }
+    } catch(e) { console.error(e); }
+};
+
+window.removeStock = async function(prodId, wKey) {
+    if(!confirm("Remove stock from this warehouse?")) return;
+    
+    const token = localStorage.getItem('token');
+    try {
+        const res = await fetch(`http://127.0.0.1:5000/inventory/stock?product_id=${prodId}&warehouse_bind_key=${wKey}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if(res.ok) { document.getElementById('inventory-link').click(); }
+        else { alert("Error removing stock"); }
+    } catch(e) { console.error(e); }
+};

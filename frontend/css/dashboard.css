@@ -330,3 +330,78 @@ td:last-child, th:last-child {
     margin-right: 5px;
     border: 1px solid #cbd5e0;
 }
+
+.badge-remove {
+    margin-left: 5px;
+    color: #e53e3e;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0 4px;
+    border-radius: 50%;
+}
+
+.badge-remove:hover {
+    background-color: #e53e3e;
+    color: white;
+}
+
+.status-pending {
+    background-color: #f39c12;
+    color: white;
+}
+
+.status-approved {
+    background-color: #27ae60;
+    color: white;
+}
+
+.status-denied {
+    background-color: #c0392b;
+    color: white;
+}
+
+.status-completed {
+    background-color: #2980b9;
+    color: white;
+}
+
+.action-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid;
+    background-color: transparent;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease;
+    margin: 0 4px;
+}
+
+.btn-approve {
+    border-color: #2ecc71;
+    color: #2ecc71;
+}
+
+.btn-approve:hover {
+    background-color: #2ecc71;
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 2px 5px rgba(46, 204, 113, 0.4);
+}
+
+.btn-deny {
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+.btn-deny:hover {
+    background-color: #e74c3c;
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 2px 5px rgba(231, 76, 60, 0.4);
+}
+

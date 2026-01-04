@@ -3,31 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Dashboard</title>
+    <title>Manager Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>Employee Panel</h2>
+        <h2>Manager Panel</h2>
         <ul>
             <li><a href="#" id="dashboard-link">Dashboard</a></li>
-            <li><a href="#" id="tasks-link">My Tasks</a></li> <li>
             <li><a href="#" id="inventory-link">Inventory</a></li>
+            <li><a href="#" id="transfers-link">Transfers</a></li>
         </ul>
         <button id="logoutBtn" class="logout-btn">Log Out</button>
     </div>
 
     <div class="main-content" id="main-content">
         <header>
-            <h1>Welcome, <span id="username-display">Employee</span></h1>
-            <p>Location: <span id="location-display">...</span></p>
+            <h1>Welcome, <span id="username-display">Manager</span></h1>
+            <p>Role: <span id="role-display">...</span> | Location: <span id="location-display">...</span></p>
         </header>
+        
+        </div>
 
-    </div>
-
-    <script src="js/employee.js"></script>
+    <script src="js/manager.js"></script>
 
 </body>
 </html>

@@ -16,17 +16,20 @@ loginForm.addEventListener('submit', async (e) => {
             body: JSON.stringify({ username, password })
         });
 
-        const data = await response.json();
-
+        
         if (response.ok) {
+            const data = await response.json();
             localStorage.setItem('token', data.access_token);
             localStorage.setItem('role', data.role);
-            localStorage.setItem('username', username);
+            localStorage.setItem('full_name', data.full_name);
+            localStorage.setItem('location', data.location);
 
-            if (data.role === 'admin' || data.role === 'manager') {
+            if (data.role === 'admin') {
                 window.location.href = 'admin.html';
+            } else if (data.role === 'manager') {
+                window.location.href = 'manager.html';
             } else {
-                window.location.href = 'employee.html';
+                window.location.href = 'employee.html'; 
             }
         } else {
             errorMsg.textContent = data.msg || 'Login failed';
